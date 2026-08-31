@@ -1,152 +1,271 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#f6f7fb" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Math Accelerator</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
-  <div class="app-shell">
-    <header class="topbar">
-      <div>
-        <div class="eyebrow">3rd → 4th Grade Readiness</div>
-        <h1>Math Accelerator</h1>
-      </div>
-      <button id="parentBtn" class="secondary">Parent Dashboard</button>
-    </header>
 
-    <main id="homeView" class="view active">
-      <section class="hero card">
+<body>
+
+  <main class="app-shell">
+
+    <!-- HOME -->
+    <section id="homeView" class="view active">
+
+      <header class="hero">
         <div>
-          <div class="eyebrow">Today's practice</div>
-          <h2>25 adaptive math questions</h2>
-          <p>Practice starts with 3rd-grade foundations and gradually introduces 4th-grade skills.</p>
+          <div class="eyebrow">Math Accelerator</div>
+          <h1>Build toward accelerated math</h1>
+          <p class="muted">
+            Adaptive 25-question practice for 3rd-grade foundations
+            with gradual 4th-grade challenge work.
+          </p>
         </div>
-        <button id="startBtn" class="primary big">Start Practice</button>
+
+        <button id="parentBtn" class="secondary">
+          Parent Dashboard
+        </button>
+      </header>
+
+      <section class="card">
+        <div class="metric-large">
+          <span class="metric-label">Accelerated Math Readiness</span>
+          <strong id="homeReadiness">0%</strong>
+        </div>
+
+        <button id="startBtn" class="primary large">
+          Start 25-Question Practice
+        </button>
       </section>
 
-      <section class="grid2">
-        <div class="card">
-          <h3>Readiness</h3>
-          <div class="score-ring" id="homeReadiness">0%</div>
-          <p class="muted">Estimated 4th-grade readiness based on completed sessions.</p>
-        </div>
-        <div class="card">
-          <h3>Recent Practice</h3>
-          <div id="recentSummary" class="metric-list"></div>
+      <section class="card">
+        <h2>Recent Practice</h2>
+        <div id="recentSummary">
+          <div class="muted">No sessions completed yet.</div>
         </div>
       </section>
 
       <section class="card">
-        <h3>Skill Progress</h3>
+        <h2>Skill Progress</h2>
         <div id="homeSkills"></div>
       </section>
-    </main>
 
-    <main id="quizView" class="view">
-      <div class="quiz-header">
-        <button id="quitBtn" class="ghost">← Exit</button>
-        <div class="progress-wrap">
+    </section>
+
+
+    <!-- QUIZ -->
+    <section id="quizView" class="view">
+
+      <header class="quiz-header">
+        <div>
           <div id="questionCount">Question 1 of 25</div>
-          <div class="progress"><div id="progressBar"></div></div>
+          <div id="skillTag" class="skill-tag"></div>
         </div>
-        <div id="sessionTimer" class="timer">00:00</div>
+
+        <div id="sessionTimer" class="timer">
+          0:00
+        </div>
+      </header>
+
+      <div class="progress">
+        <div id="progressBar"></div>
       </div>
 
-      <section class="question-card card">
-        <div id="skillTag" class="tag"></div>
-        <h2 id="questionText"></h2>
-        <div id="visualArea"></div>
+      <section class="card quiz-card">
+
+        <h1 id="questionText"></h1>
+
         <div id="answerArea"></div>
+
         <div id="feedback" class="feedback"></div>
-        <div class="question-actions">
-          <button id="checkBtn" class="primary">Check Answer</button>
-          <button id="nextBtn" class="primary hidden">Next Question</button>
-        </div>
-      </section>
-    </main>
 
-    <main id="resultsView" class="view">
-      <section class="card results-hero">
-        <div class="eyebrow">Practice complete</div>
-        <h2 id="resultHeadline">Nice work.</h2>
-        <div class="result-grid">
-          <div><strong id="resultScore">0%</strong><span>Score</span></div>
-          <div><strong id="resultFirst">0%</strong><span>First attempt</span></div>
-          <div><strong id="resultTime">0:00</strong><span>Time</span></div>
-          <div><strong id="resultReadiness">0%</strong><span>Readiness</span></div>
+        <div class="button-row">
+
+          <button id="checkBtn" class="primary">
+            Check Answer
+          </button>
+
+          <button id="nextBtn" class="primary hidden">
+            Next Question
+          </button>
+
+          <button id="quitBtn" class="secondary">
+            Exit
+          </button>
+
         </div>
-        <div id="emailStatus" class="email-status"></div>
-        <button id="doneBtn" class="primary">Back to Home</button>
+
       </section>
 
-      <section class="grid2">
-        <div class="card">
-          <h3>Strengths</h3>
-          <div id="strengths"></div>
+    </section>
+
+
+    <!-- RESULTS -->
+    <section id="resultsView" class="view">
+
+      <header>
+        <div class="eyebrow">Session Complete</div>
+        <h1 id="resultHeadline">Practice complete.</h1>
+      </header>
+
+      <section class="summary-grid">
+
+        <div class="card metric-card">
+          <span>Score</span>
+          <strong id="resultScore">0%</strong>
         </div>
-        <div class="card">
-          <h3>Needs Practice</h3>
-          <div id="needsPractice"></div>
+
+        <div class="card metric-card">
+          <span>First Attempt</span>
+          <strong id="resultFirst">0%</strong>
         </div>
+
+        <div class="card metric-card">
+          <span>Practice Time</span>
+          <strong id="resultTime">0:00</strong>
+        </div>
+
+        <div class="card metric-card">
+          <span>Readiness</span>
+          <strong id="resultReadiness">0%</strong>
+        </div>
+
       </section>
 
       <section class="card">
-        <h3>Missed Questions</h3>
+        <h2>Strengths</h2>
+        <div id="strengths"></div>
+      </section>
+
+      <section class="card">
+        <h2>Needs Practice</h2>
+        <div id="needsPractice"></div>
+      </section>
+
+      <section class="card">
+        <h2>Questions to Review</h2>
         <div id="missedQuestions"></div>
       </section>
-    </main>
 
-    <main id="parentView" class="view">
-      <div class="parent-header">
-        <button id="parentBackBtn" class="ghost">← Home</button>
+      <section class="card">
+        <div id="emailStatus" class="muted"></div>
+      </section>
+
+      <button id="doneBtn" class="primary large">
+        Back to Home
+      </button>
+
+    </section>
+
+
+    <!-- PARENT DASHBOARD -->
+    <section id="parentView" class="view">
+
+      <header class="hero">
         <div>
-          <div class="eyebrow">Parent view</div>
-          <h2>Progress Dashboard</h2>
+          <div class="eyebrow">Parent Dashboard</div>
+          <h1>Progress Overview</h1>
         </div>
-      </div>
 
-      <section class="grid4">
-        <div class="card metric-card"><span>Readiness</span><strong id="dashReadiness">0%</strong></div>
-        <div class="card metric-card"><span>Sessions</span><strong id="dashSessions">0</strong></div>
-        <div class="card metric-card"><span>Avg. Score</span><strong id="dashAverage">0%</strong></div>
-        <div class="card metric-card"><span>Questions</span><strong id="dashQuestions">0</strong></div>
+        <button id="parentBackBtn" class="secondary">
+          Back
+        </button>
+      </header>
+
+      <section class="summary-grid">
+
+        <div class="card metric-card">
+          <span>Readiness</span>
+          <strong id="dashReadiness">0%</strong>
+        </div>
+
+        <div class="card metric-card">
+          <span>Sessions</span>
+          <strong id="dashSessions">0</strong>
+        </div>
+
+        <div class="card metric-card">
+          <span>Average Score</span>
+          <strong id="dashAverage">0%</strong>
+        </div>
+
+        <div class="card metric-card">
+          <span>Questions</span>
+          <strong id="dashQuestions">0</strong>
+        </div>
+
       </section>
 
       <section class="card">
-        <h3>Mastery by Skill</h3>
+        <h2>Email Report Settings</h2>
+
+        <label for="studentName">
+          Student Name
+        </label>
+
+        <input
+          id="studentName"
+          type="text"
+          placeholder="Student"
+        />
+
+        <label class="checkbox-row">
+          <input
+            id="autoEmail"
+            type="checkbox"
+          />
+          Automatically email parents after each completed practice session
+        </label>
+
+        <div class="button-row">
+
+          <button id="saveSettingsBtn" class="primary">
+            Save Settings
+          </button>
+
+          <button id="testEmailBtn" class="secondary">
+            Send Test Email
+          </button>
+
+        </div>
+
+        <div
+          id="settingsStatus"
+          class="muted"
+        ></div>
+
+      </section>
+
+      <section class="card">
+        <h2>Skill Mastery</h2>
         <div id="dashSkills"></div>
       </section>
 
       <section class="card">
-        <h3>Recent Sessions</h3>
+        <h2>Practice History</h2>
         <div id="sessionHistory"></div>
       </section>
 
-      <section class="card">
-        <h3>Email Reports</h3>
-        <p class="muted">Reports can be sent automatically after each completed practice session. The two parent email addresses are stored securely in the email backend, not in the browser.</p>
-        <div class="settings-grid">
-          <label>Student name<input id="studentName" type="text" placeholder="Student"></label>
-          <label class="checkrow"><input id="autoEmail" type="checkbox"> Send a report after every session</label>
-        </div>
-        <label>Email service endpoint<input id="emailEndpoint" type="url" placeholder="https://your-app.vercel.app/api/send-report"></label>
-        <div class="inline-actions">
-          <button id="saveSettingsBtn" class="primary">Save Settings</button>
-          <button id="testEmailBtn" class="secondary">Send Test Email</button>
-        </div>
-        <div id="settingsStatus" class="muted"></div>
+      <section class="card danger-zone">
+        <h2>Reset Progress</h2>
+
+        <p class="muted">
+          This permanently deletes all locally stored practice history
+          and skill mastery data on this device.
+        </p>
+
+        <button id="resetBtn" class="danger">
+          Delete Practice History
+        </button>
       </section>
 
-      <section class="card danger-zone">
-        <h3>Data</h3>
-        <button id="resetBtn" class="danger">Reset All Progress</button>
-      </section>
-    </main>
-  </div>
+    </section>
+
+  </main>
 
   <script src="app.js"></script>
+
 </body>
 </html>
