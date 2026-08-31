@@ -1,3 +1,4 @@
+alert("Math Accelerator JavaScript loaded");
 const SKILLS = {
   addsub: {name:"Addition & Subtraction", grade:3},
   multiplication: {name:"Multiplication", grade:3},
