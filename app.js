@@ -1,5 +1,3 @@
-alert("Math Accelerator JavaScript loaded");
-
 const SKILLS = {
   addition: { name: "Addition & Subtraction", grade: 3 },
   multiplication: { name: "Multiplication", grade: 3 },
@@ -799,76 +797,6 @@ function generateQuestion(difficulty) {
 }
 
 /*
-HOME SCREEN MODE BUTTONS
-*/
-
-function buildModeButtons() {
-  const startButton =
-    $("startBtn");
-
-  if (
-    !startButton ||
-    $("mapBtn")
-  ) {
-    return;
-  }
-
-  startButton.textContent =
-    "Practice Mode — 25 Questions";
-
-  const mapButton =
-    document.createElement(
-      "button"
-    );
-
-  mapButton.id =
-    "mapBtn";
-
-  mapButton.className =
-    "secondary large";
-
-  mapButton.style.marginTop =
-    "12px";
-
-  mapButton.style.width =
-    "100%";
-
-  mapButton.textContent =
-    "MAP-Style Simulation — 43 Questions";
-
-  startButton.insertAdjacentElement(
-    "afterend",
-    mapButton
-  );
-
-  const note =
-    document.createElement(
-      "p"
-    );
-
-  note.className =
-    "muted";
-
-  note.style.marginTop =
-    "12px";
-
-  note.textContent =
-    "Practice gives immediate feedback. MAP-style simulation is adaptive and saves all feedback until the end.";
-
-  mapButton.insertAdjacentElement(
-    "afterend",
-    note
-  );
-
-  mapButton.addEventListener(
-    "click",
-    () => {
-      startSession("map");
-    }
-  );
-}
-
-/*
 HOME
 */
 
@@ -1174,26 +1102,11 @@ function renderAnswerArea(
 
 function escapeHtml(value) {
   return String(value)
-    .replaceAll(
-      "&",
-      "&amp;"
-    )
-    .replaceAll(
-      "<",
-      "&lt;"
-    )
-    .replaceAll(
-      ">",
-      "&gt;"
-    )
-    .replaceAll(
-      '"',
-      "&quot;"
-    )
-    .replaceAll(
-      "'",
-      "&#039;"
-    );
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }
 
 function getStudentAnswer() {
@@ -2006,11 +1919,22 @@ function wireEvents() {
       }
     );
 
+  $("mapBtn")
+    ?.addEventListener(
+      "click",
+      () => {
+        startSession(
+          "map"
+        );
+      }
+    );
+
   $("parentBtn")
     ?.addEventListener(
       "click",
       () => {
         renderDashboard();
+
         showView(
           "parentView"
         );
@@ -2022,6 +1946,7 @@ function wireEvents() {
       "click",
       () => {
         renderHome();
+
         showView(
           "homeView"
         );
@@ -2074,6 +1999,7 @@ function wireEvents() {
       "click",
       () => {
         renderHome();
+
         showView(
           "homeView"
         );
@@ -2110,7 +2036,6 @@ function wireEvents() {
 START APP
 */
 
-buildModeButtons();
 wireEvents();
 renderHome();
 showView("homeView");
