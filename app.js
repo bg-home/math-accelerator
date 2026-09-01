@@ -757,4 +757,1360 @@ function generateQuestion(difficulty) {
 
       d,
 
-      `The
+      `The pattern increases by ${step} each time.`
+    );
+  }
+
+  /*
+  MULTI-STEP WORD PROBLEM
+  */
+
+  const boxes =
+    rand(2, 8);
+
+  const perBox =
+    rand(3, 12);
+
+  const used =
+    rand(
+      1,
+      Math.max(
+        1,
+        boxes - 1
+      )
+    );
+
+  const answer =
+    boxes *
+    perBox -
+    used;
+
+  return numericQuestion(
+    "multiStep",
+
+    `There are ${boxes} boxes with ${perBox} pencils in each box. Then ${used} pencils are used. How many pencils remain?`,
+
+    answer,
+
+    d,
+
+    `First multiply ${boxes} × ${perBox}, then subtract ${used}.`
+  );
+}
+
+/*
+HOME SCREEN MODE BUTTONS
+*/
+
+function buildModeButtons() {
+  const startButton =
+    $("startBtn");
+
+  if (
+    !startButton ||
+    $("mapBtn")
+  ) {
+    return;
+  }
+
+  startButton.textContent =
+    "Practice Mode — 25 Questions";
+
+  const mapButton =
+    document.createElement(
+      "button"
+    );
+
+  mapButton.id =
+    "mapBtn";
+
+  mapButton.className =
+    "secondary large";
+
+  mapButton.style.marginTop =
+    "12px";
+
+  mapButton.style.width =
+    "100%";
+
+  mapButton.textContent =
+    "MAP-Style Simulation — 43 Questions";
+
+  startButton.insertAdjacentElement(
+    "afterend",
+    mapButton
+  );
+
+  const note =
+    document.createElement(
+      "p"
+    );
+
+  note.className =
+    "muted";
+
+  note.style.marginTop =
+    "12px";
+
+  note.textContent =
+    "Practice gives immediate feedback. MAP-style simulation is adaptive and saves all feedback until the end.";
+
+  mapButton.insertAdjacentElement(
+    "afterend",
+    note
+  );
+
+  mapButton.addEventListener(
+    "click",
+    () => {
+      startSession("map");
+    }
+  );
+}
+
+/*
+HOME
+*/
+
+function renderHome() {
+  $("homeReadiness").textContent =
+    `${overallReadiness()}%`;
+
+  const recent =
+    state.history[0];
+
+  if (recent) {
+    const percentage =
+      Math.round(
+        recent.correct /
+        recent.total *
+        100
+      );
+
+    $("recentSummary").innerHTML =
+      `<strong>${recent.mode === "map" ? "MAP-style" : "Practice"}</strong>
+      — ${recent.correct}/${recent.total}
+      (${percentage}%)
+      · ${formatTime(recent.seconds || 0)}`;
+
+  } else {
+    $("recentSummary").innerHTML =
+      `<div class="muted">
+        No sessions completed yet.
+      </div>`;
+  }
+
+  $("homeSkills").innerHTML =
+    Object
+      .entries(SKILLS)
+      .map(
+        ([key, skill]) => {
+
+          const score =
+            masteryScore(key);
+
+          return `
+            <div style="margin:10px 0">
+
+              <div style="
+                display:flex;
+                justify-content:space-between;
+                gap:12px;
+              ">
+
+                <span>
+                  ${skill.name}
+                </span>
+
+                <strong>
+                  ${score}%
+                </strong>
+
+              </div>
+
+              <div class="progress">
+                <div
+                  style="width:${score}%"
+                ></div>
+              </div>
+
+            </div>
+          `;
+        }
+      )
+      .join("");
+}
+
+/*
+START SESSION
+*/
+
+function startSession(
+  mode = "practice"
+) {
+  clearInterval(timerId);
+
+  const total =
+    mode === "map"
+      ? 43
+      : 25;
+
+  const startDifficulty =
+    clamp(
+      Math.round(
+        overallReadiness() /
+        25
+      ) + 1,
+      2,
+      4
+    );
+
+  session = {
+    mode,
+    total,
+    index: 0,
+    correct: 0,
+    firstAttempt: 0,
+    answers: [],
+    seconds: 0,
+    difficulty:
+      startDifficulty,
+    currentQuestion:
+      null,
+    attemptsOnQuestion:
+      0
+  };
+
+  state.currentMode =
+    mode;
+
+  showView(
+    "quizView"
+  );
+
+  timerId =
+    setInterval(
+      () => {
+
+        if (!session) {
+          return;
+        }
+
+        session.seconds++;
+
+        $("sessionTimer")
+          .textContent =
+          formatTime(
+            session.seconds
+          );
+
+      },
+      1000
+    );
+
+  nextQuestion();
+}
+
+/*
+NEXT QUESTION
+*/
+
+function nextQuestion() {
+  if (!session) {
+    return;
+  }
+
+  if (
+    session.index >=
+    session.total
+  ) {
+    finishSession();
+    return;
+  }
+
+  session.currentQuestion =
+    generateQuestion(
+      session.difficulty
+    );
+
+  session.attemptsOnQuestion =
+    0;
+
+  const question =
+    session.currentQuestion;
+
+  $("questionCount")
+    .textContent =
+    `Question ${session.index + 1} of ${session.total}`;
+
+  $("skillTag")
+    .textContent =
+    `${SKILLS[question.skill].name} · Level ${question.difficulty}`;
+
+  $("questionText")
+    .textContent =
+    question.prompt;
+
+  $("feedback")
+    .innerHTML =
+    "";
+
+  $("nextBtn")
+    .classList
+    .add("hidden");
+
+  $("checkBtn")
+    .classList
+    .remove("hidden");
+
+  $("progressBar")
+    .style
+    .width =
+    `${
+      (
+        session.index /
+        session.total
+      ) * 100
+    }%`;
+
+  renderAnswerArea(
+    question
+  );
+}
+
+/*
+ANSWER AREA
+*/
+
+function renderAnswerArea(
+  question
+) {
+  const area =
+    $("answerArea");
+
+  area.innerHTML =
+    "";
+
+  if (
+    question.type ===
+    "choice"
+  ) {
+    question.options
+      .forEach(
+        option => {
+
+          const label =
+            document
+              .createElement(
+                "label"
+              );
+
+          label.style.display =
+            "block";
+
+          label.style.padding =
+            "12px";
+
+          label.style.margin =
+            "8px 0";
+
+          label.style.border =
+            "1px solid #d7dce3";
+
+          label.style.borderRadius =
+            "10px";
+
+          label.innerHTML =
+            `
+            <input
+              type="radio"
+              name="answerChoice"
+              value="${escapeHtml(option)}"
+              style="margin-right:10px"
+            >
+
+            ${escapeHtml(option)}
+            `;
+
+          area.appendChild(
+            label
+          );
+        }
+      );
+
+  } else {
+    const input =
+      document
+        .createElement(
+          "input"
+        );
+
+    input.id =
+      "numericAnswer";
+
+    input.type =
+      question.type ===
+      "number"
+        ? "number"
+        : "text";
+
+    input.inputMode =
+      question.type ===
+      "number"
+        ? "decimal"
+        : "text";
+
+    input.placeholder =
+      "Enter your answer";
+
+    input.autocomplete =
+      "off";
+
+    area.appendChild(
+      input
+    );
+  }
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll(
+      "&",
+      "&amp;"
+    )
+    .replaceAll(
+      "<",
+      "&lt;"
+    )
+    .replaceAll(
+      ">",
+      "&gt;"
+    )
+    .replaceAll(
+      '"',
+      "&quot;"
+    )
+    .replaceAll(
+      "'",
+      "&#039;"
+    );
+}
+
+function getStudentAnswer() {
+  const question =
+    session.currentQuestion;
+
+  if (
+    question.type ===
+    "choice"
+  ) {
+    const selected =
+      document.querySelector(
+        'input[name="answerChoice"]:checked'
+      );
+
+    return selected
+      ? selected.value.trim()
+      : "";
+  }
+
+  const input =
+    $("numericAnswer");
+
+  return input
+    ? input.value.trim()
+    : "";
+}
+
+function normalizeAnswer(
+  value
+) {
+  return String(value)
+    .trim()
+    .toLowerCase()
+    .replace(/,/g, "")
+    .replace(/\s+/g, "");
+}
+
+/*
+CHECK ANSWER
+*/
+
+function checkAnswer() {
+  if (
+    !session ||
+    !session.currentQuestion
+  ) {
+    return;
+  }
+
+  const studentAnswer =
+    getStudentAnswer();
+
+  if (!studentAnswer) {
+    $("feedback")
+      .textContent =
+      "Choose or enter an answer first.";
+
+    return;
+  }
+
+  const question =
+    session.currentQuestion;
+
+  session
+    .attemptsOnQuestion++;
+
+  const correct =
+    normalizeAnswer(
+      studentAnswer
+    ) ===
+    normalizeAnswer(
+      question.answer
+    );
+
+  session.answers.push({
+    number:
+      session.index + 1,
+
+    skill:
+      question.skill,
+
+    question:
+      question.prompt,
+
+    studentAnswer,
+
+    answer:
+      question.answer,
+
+    correct,
+
+    difficulty:
+      question.difficulty
+  });
+
+  if (correct) {
+    session.correct++;
+
+    if (
+      session
+        .attemptsOnQuestion ===
+      1
+    ) {
+      session
+        .firstAttempt++;
+    }
+  }
+
+  updateMastery(
+    question.skill,
+    correct,
+    question.difficulty
+  );
+
+  /*
+  MAP-STYLE MODE
+  */
+
+  if (
+    session.mode ===
+    "map"
+  ) {
+    session.difficulty =
+      clamp(
+        session.difficulty +
+        (
+          correct
+            ? 0.45
+            : -0.55
+        ),
+        1,
+        5
+      );
+
+    session.index++;
+
+    setTimeout(
+      nextQuestion,
+      100
+    );
+
+    return;
+  }
+
+  /*
+  PRACTICE MODE
+  */
+
+  if (correct) {
+    $("feedback")
+      .innerHTML =
+      `<strong>Correct!</strong>
+      ${escapeHtml(
+        question.explanation
+      )}`;
+
+  } else {
+    $("feedback")
+      .innerHTML =
+      `<strong>Not quite.</strong>
+      The correct answer is
+      <strong>
+        ${escapeHtml(
+          question.answer
+        )}
+      </strong>.
+      ${escapeHtml(
+        question.explanation
+      )}`;
+  }
+
+  $("checkBtn")
+    .classList
+    .add("hidden");
+
+  $("nextBtn")
+    .classList
+    .remove("hidden");
+}
+
+function finishPracticeQuestion() {
+  if (!session) {
+    return;
+  }
+
+  session.index++;
+  nextQuestion();
+}
+
+/*
+FINISH SESSION
+*/
+
+function finishSession() {
+  clearInterval(
+    timerId
+  );
+
+  if (!session) {
+    return;
+  }
+
+  const record = {
+    date:
+      new Date()
+        .toISOString(),
+
+    mode:
+      session.mode,
+
+    total:
+      session.total,
+
+    correct:
+      session.correct,
+
+    firstAttempt:
+      session.firstAttempt,
+
+    seconds:
+      session.seconds,
+
+    answers:
+      session.answers,
+
+    readiness:
+      overallReadiness()
+  };
+
+  state.history.unshift(
+    record
+  );
+
+  state.history =
+    state.history.slice(
+      0,
+      50
+    );
+
+  saveState();
+
+  renderResults(
+    record
+  );
+
+  showView(
+    "resultsView"
+  );
+
+  if (
+    state.settings.autoEmail
+  ) {
+    sendReport(
+      record,
+      false
+    );
+  }
+
+  session = null;
+}
+
+/*
+RESULTS
+*/
+
+function renderResults(record) {
+  const percentage =
+    Math.round(
+      record.correct /
+      record.total *
+      100
+    );
+
+  const firstPercentage =
+    Math.round(
+      record.firstAttempt /
+      record.total *
+      100
+    );
+
+  $("resultHeadline")
+    .textContent =
+    record.mode === "map"
+      ? "MAP-style simulation complete."
+      : "Practice complete.";
+
+  $("resultScore")
+    .textContent =
+    `${percentage}%`;
+
+  $("resultFirst")
+    .textContent =
+    `${firstPercentage}%`;
+
+  $("resultTime")
+    .textContent =
+    formatTime(
+      record.seconds
+    );
+
+  $("resultReadiness")
+    .textContent =
+    `${overallReadiness()}%`;
+
+  const bySkill = {};
+
+  record.answers
+    .forEach(
+      answer => {
+
+        if (
+          !bySkill[
+            answer.skill
+          ]
+        ) {
+          bySkill[
+            answer.skill
+          ] = {
+            attempted: 0,
+            correct: 0
+          };
+        }
+
+        bySkill[
+          answer.skill
+        ].attempted++;
+
+        if (
+          answer.correct
+        ) {
+          bySkill[
+            answer.skill
+          ].correct++;
+        }
+      }
+    );
+
+  const ranked =
+    Object
+      .entries(bySkill)
+      .map(
+        ([skill, values]) => ({
+          skill,
+
+          name:
+            SKILLS[skill].name,
+
+          pct:
+            Math.round(
+              values.correct /
+              values.attempted *
+              100
+            ),
+
+          ...values
+        })
+      )
+      .sort(
+        (a, b) =>
+          b.pct -
+          a.pct
+      );
+
+  const strengths =
+    ranked
+      .filter(
+        item =>
+          item.pct >= 75
+      )
+      .slice(
+        0,
+        5
+      );
+
+  const needsPractice =
+    ranked
+      .filter(
+        item =>
+          item.pct < 75
+      )
+      .sort(
+        (a, b) =>
+          a.pct -
+          b.pct
+      )
+      .slice(
+        0,
+        5
+      );
+
+  $("strengths")
+    .innerHTML =
+    strengths.length
+      ? strengths
+          .map(
+            item =>
+              `<div>
+                ${escapeHtml(item.name)}
+                —
+                <strong>
+                  ${item.pct}%
+                </strong>
+              </div>`
+          )
+          .join("")
+      : `<div class="muted">
+          Keep practicing to establish clear strengths.
+        </div>`;
+
+  $("needsPractice")
+    .innerHTML =
+    needsPractice.length
+      ? needsPractice
+          .map(
+            item =>
+              `<div>
+                ${escapeHtml(item.name)}
+                —
+                <strong>
+                  ${item.pct}%
+                </strong>
+              </div>`
+          )
+          .join("")
+      : `<div class="muted">
+          No major weak areas in this session.
+        </div>`;
+
+  const missed =
+    record.answers
+      .filter(
+        answer =>
+          !answer.correct
+      );
+
+  $("missedQuestions")
+    .innerHTML =
+    missed.length
+      ? missed
+          .slice(
+            0,
+            15
+          )
+          .map(
+            answer =>
+              `
+              <div style="margin-bottom:14px">
+
+                <strong>
+                  ${escapeHtml(
+                    answer.question
+                  )}
+                </strong>
+
+                <br>
+
+                <span class="muted">
+                  Answered:
+                  ${escapeHtml(
+                    answer.studentAnswer ||
+                    "—"
+                  )}
+
+                  · Correct:
+
+                  ${escapeHtml(
+                    answer.answer
+                  )}
+                </span>
+
+              </div>
+              `
+          )
+          .join("")
+      : `<div>
+          Perfect session — no missed questions.
+        </div>`;
+
+  $("emailStatus")
+    .textContent =
+    state.settings.autoEmail
+      ? "Parent email report is being sent automatically."
+      : "Automatic parent email is turned off.";
+}
+
+/*
+PARENT DASHBOARD
+*/
+
+function renderDashboard() {
+  $("dashReadiness")
+    .textContent =
+    `${overallReadiness()}%`;
+
+  $("dashSessions")
+    .textContent =
+    state.history.length;
+
+  const totalQuestions =
+    state.history.reduce(
+      (sum, item) =>
+        sum +
+        (item.total || 0),
+      0
+    );
+
+  const totalCorrect =
+    state.history.reduce(
+      (sum, item) =>
+        sum +
+        (item.correct || 0),
+      0
+    );
+
+  $("dashQuestions")
+    .textContent =
+    totalQuestions;
+
+  $("dashAverage")
+    .textContent =
+    totalQuestions
+      ? `${Math.round(
+          totalCorrect /
+          totalQuestions *
+          100
+        )}%`
+      : "0%";
+
+  $("studentName")
+    .value =
+    state.settings
+      .studentName ||
+    "Student";
+
+  $("autoEmail")
+    .checked =
+    !!state.settings
+      .autoEmail;
+
+  $("dashSkills")
+    .innerHTML =
+    Object
+      .entries(SKILLS)
+      .map(
+        ([key, skill]) => {
+
+          const score =
+            masteryScore(key);
+
+          return `
+          <div style="margin:10px 0">
+
+            <div style="
+              display:flex;
+              justify-content:space-between;
+            ">
+
+              <span>
+                ${escapeHtml(
+                  skill.name
+                )}
+              </span>
+
+              <strong>
+                ${score}%
+              </strong>
+
+            </div>
+
+            <div class="progress">
+              <div
+                style="width:${score}%"
+              ></div>
+            </div>
+
+          </div>
+          `;
+        }
+      )
+      .join("");
+
+  if (
+    state.history.length
+  ) {
+    $("sessionHistory")
+      .innerHTML =
+      state.history
+        .map(
+          item => {
+
+            const percentage =
+              Math.round(
+                item.correct /
+                item.total *
+                100
+              );
+
+            const date =
+              new Date(
+                item.date
+              )
+              .toLocaleDateString();
+
+            return `
+            <div style="
+              padding:10px 0;
+              border-bottom:1px solid #eee;
+            ">
+
+              <strong>
+                ${date}
+              </strong>
+
+              —
+
+              ${
+                item.mode === "map"
+                  ? "MAP-style"
+                  : "Practice"
+              }
+
+              —
+
+              ${item.correct}/${item.total}
+
+              (${percentage}%)
+
+            </div>
+            `;
+          }
+        )
+        .join("");
+
+  } else {
+    $("sessionHistory")
+      .innerHTML =
+      `<div class="muted">
+        No practice history yet.
+      </div>`;
+  }
+}
+
+/*
+SETTINGS
+*/
+
+function saveSettings() {
+  state.settings.studentName =
+    $("studentName")
+      .value
+      .trim() ||
+    "Student";
+
+  state.settings.autoEmail =
+    $("autoEmail")
+      .checked;
+
+  saveState();
+
+  $("settingsStatus")
+    .textContent =
+    "Settings saved.";
+}
+
+/*
+EMAIL
+*/
+
+async function sendReport(
+  record = null,
+  isTest = false
+) {
+  const statusElement =
+    isTest
+      ? $("settingsStatus")
+      : $("emailStatus");
+
+  if (statusElement) {
+    statusElement.textContent =
+      isTest
+        ? "Sending test email…"
+        : "Sending parent report…";
+  }
+
+  const payload = {
+    test:
+      isTest,
+
+    studentName:
+      state.settings.studentName ||
+      "Student",
+
+    session:
+      record || null,
+
+    readiness:
+      overallReadiness(),
+
+    mastery:
+      Object.fromEntries(
+        Object
+          .entries(SKILLS)
+          .map(
+            ([key, value]) => [
+              value.name,
+              masteryScore(key)
+            ]
+          )
+      )
+  };
+
+  try {
+    const response =
+      await fetch(
+        "/api/send-report",
+        {
+          method:
+            "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body:
+            JSON.stringify(
+              payload
+            )
+        }
+      );
+
+    const data =
+      await response
+        .json()
+        .catch(
+          () => ({})
+        );
+
+    if (
+      !response.ok ||
+      data.success === false
+    ) {
+      throw new Error(
+        data.error ||
+        "Unable to send email"
+      );
+    }
+
+    if (statusElement) {
+      statusElement.textContent =
+        isTest
+          ? "Test email sent. Check both parent inboxes."
+          : "Parent report sent.";
+    }
+
+  } catch (error) {
+    console.error(
+      error
+    );
+
+    if (statusElement) {
+      statusElement.textContent =
+        `Email error: ${error.message}`;
+    }
+  }
+}
+
+/*
+RESET
+*/
+
+function resetProgress() {
+  const confirmed =
+    confirm(
+      "Delete all practice history and skill mastery on this device?"
+    );
+
+  if (!confirmed) {
+    return;
+  }
+
+  const settings = {
+    ...state.settings
+  };
+
+  state =
+    defaultState();
+
+  state.settings =
+    settings;
+
+  saveState();
+  renderDashboard();
+  renderHome();
+}
+
+/*
+BUTTONS
+*/
+
+function wireEvents() {
+  $("startBtn")
+    ?.addEventListener(
+      "click",
+      () => {
+        startSession(
+          "practice"
+        );
+      }
+    );
+
+  $("parentBtn")
+    ?.addEventListener(
+      "click",
+      () => {
+        renderDashboard();
+        showView(
+          "parentView"
+        );
+      }
+    );
+
+  $("parentBackBtn")
+    ?.addEventListener(
+      "click",
+      () => {
+        renderHome();
+        showView(
+          "homeView"
+        );
+      }
+    );
+
+  $("checkBtn")
+    ?.addEventListener(
+      "click",
+      checkAnswer
+    );
+
+  $("nextBtn")
+    ?.addEventListener(
+      "click",
+      finishPracticeQuestion
+    );
+
+  $("quitBtn")
+    ?.addEventListener(
+      "click",
+      () => {
+
+        const confirmed =
+          confirm(
+            "Exit this session? Current answers will not be saved."
+          );
+
+        if (
+          confirmed
+        ) {
+          clearInterval(
+            timerId
+          );
+
+          session =
+            null;
+
+          renderHome();
+
+          showView(
+            "homeView"
+          );
+        }
+      }
+    );
+
+  $("doneBtn")
+    ?.addEventListener(
+      "click",
+      () => {
+        renderHome();
+        showView(
+          "homeView"
+        );
+      }
+    );
+
+  $("saveSettingsBtn")
+    ?.addEventListener(
+      "click",
+      saveSettings
+    );
+
+  $("testEmailBtn")
+    ?.addEventListener(
+      "click",
+      () => {
+        saveSettings();
+
+        sendReport(
+          null,
+          true
+        );
+      }
+    );
+
+  $("resetBtn")
+    ?.addEventListener(
+      "click",
+      resetProgress
+    );
+}
+
+/*
+START APP
+*/
+
+buildModeButtons();
+wireEvents();
+renderHome();
+showView("homeView");
