@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Math Accelerator App</title>
+  <title>Math Accelerator</title>
   <link rel="stylesheet" href="./styles.css" />
 </head>
 
@@ -19,8 +19,8 @@
           <div class="eyebrow">Math Accelerator</div>
           <h1>Build toward accelerated math</h1>
           <p class="muted">
-            Adaptive 25-question practice for 3rd-grade foundations
-            with gradual 4th-grade challenge work.
+            Adaptive practice and MAP-style simulation for building confidence,
+            reasoning, and readiness for accelerated math.
           </p>
         </div>
 
@@ -30,20 +30,56 @@
       </header>
 
       <section class="card">
+
         <div class="metric-large">
-          <span class="metric-label">Accelerated Math Readiness</span>
-          <strong id="homeReadiness">0%</strong>
+          <span class="metric-label">
+            Accelerated Math Readiness
+          </span>
+
+          <strong id="homeReadiness">
+            0%
+          </strong>
         </div>
+
+      </section>
+
+      <section class="card">
+
+        <h2>Practice Mode</h2>
+
+        <p class="muted">
+          25 adaptive questions with immediate feedback and explanations.
+          Best for learning and improving weak skills.
+        </p>
 
         <button id="startBtn" class="primary large">
           Start 25-Question Practice
         </button>
+
+      </section>
+
+      <section class="card">
+
+        <h2>MAP-Style Simulation</h2>
+
+        <p class="muted">
+          43 adaptive questions with no answer feedback during the test.
+          Results and skill analysis appear after completion.
+        </p>
+
+        <button id="mapBtn" class="secondary large">
+          Start MAP-Style Simulation
+        </button>
+
       </section>
 
       <section class="card">
         <h2>Recent Practice</h2>
+
         <div id="recentSummary">
-          <div class="muted">No sessions completed yet.</div>
+          <div class="muted">
+            No sessions completed yet.
+          </div>
         </div>
       </section>
 
@@ -54,18 +90,25 @@
 
     </section>
 
+
     <!-- QUIZ -->
     <section id="quizView" class="view">
 
       <header class="quiz-header">
+
         <div>
-          <div id="questionCount">Question 1 of 25</div>
-          <div id="skillTag" class="skill-tag"></div>
+          <div id="questionCount">
+            Question 1
+          </div>
+
+          <div id="skillTag" class="skill-tag">
+          </div>
         </div>
 
         <div id="sessionTimer" class="timer">
           0:00
         </div>
+
       </header>
 
       <div class="progress">
@@ -100,34 +143,50 @@
 
     </section>
 
+
     <!-- RESULTS -->
     <section id="resultsView" class="view">
 
       <header>
-        <div class="eyebrow">Session Complete</div>
-        <h1 id="resultHeadline">Practice complete.</h1>
+
+        <div class="eyebrow">
+          Session Complete
+        </div>
+
+        <h1 id="resultHeadline">
+          Practice complete.
+        </h1>
+
       </header>
 
       <section class="summary-grid">
 
         <div class="card metric-card">
           <span>Score</span>
-          <strong id="resultScore">0%</strong>
+          <strong id="resultScore">
+            0%
+          </strong>
         </div>
 
         <div class="card metric-card">
           <span>First Attempt</span>
-          <strong id="resultFirst">0%</strong>
+          <strong id="resultFirst">
+            0%
+          </strong>
         </div>
 
         <div class="card metric-card">
           <span>Practice Time</span>
-          <strong id="resultTime">0:00</strong>
+          <strong id="resultTime">
+            0:00
+          </strong>
         </div>
 
         <div class="card metric-card">
           <span>Readiness</span>
-          <strong id="resultReadiness">0%</strong>
+          <strong id="resultReadiness">
+            0%
+          </strong>
         </div>
 
       </section>
@@ -157,45 +216,62 @@
 
     </section>
 
+
     <!-- PARENT DASHBOARD -->
     <section id="parentView" class="view">
 
       <header class="hero">
+
         <div>
-          <div class="eyebrow">Parent Dashboard</div>
-          <h1>Progress Overview</h1>
+          <div class="eyebrow">
+            Parent Dashboard
+          </div>
+
+          <h1>
+            Progress Overview
+          </h1>
         </div>
 
         <button id="parentBackBtn" class="secondary">
           Back
         </button>
+
       </header>
 
       <section class="summary-grid">
 
         <div class="card metric-card">
           <span>Readiness</span>
-          <strong id="dashReadiness">0%</strong>
+          <strong id="dashReadiness">
+            0%
+          </strong>
         </div>
 
         <div class="card metric-card">
           <span>Sessions</span>
-          <strong id="dashSessions">0</strong>
+          <strong id="dashSessions">
+            0
+          </strong>
         </div>
 
         <div class="card metric-card">
           <span>Average Score</span>
-          <strong id="dashAverage">0%</strong>
+          <strong id="dashAverage">
+            0%
+          </strong>
         </div>
 
         <div class="card metric-card">
           <span>Questions</span>
-          <strong id="dashQuestions">0</strong>
+          <strong id="dashQuestions">
+            0
+          </strong>
         </div>
 
       </section>
 
       <section class="card">
+
         <h2>Email Report Settings</h2>
 
         <label for="studentName">
@@ -209,11 +285,14 @@
         />
 
         <label class="checkbox-row">
+
           <input
             id="autoEmail"
             type="checkbox"
           />
-          Automatically email parents after each completed practice session
+
+          Automatically email parents after each completed session
+
         </label>
 
         <div class="button-row">
@@ -243,29 +322,25 @@
       </section>
 
       <section class="card danger-zone">
+
         <h2>Reset Progress</h2>
 
         <p class="muted">
-          This permanently deletes all locally stored practice history
+          This permanently deletes locally stored practice history
           and skill mastery data on this device.
         </p>
 
         <button id="resetBtn" class="danger">
           Delete Practice History
         </button>
+
       </section>
 
     </section>
 
   </main>
 
-  <!-- TEMPORARY DIAGNOSTIC -->
-  <script>
-    alert("INLINE JAVASCRIPT WORKS");
-  </script>
-
-  <!-- LOAD MATH ACCELERATOR -->
-  <script src="./app.js?v=4"></script>
+  <script src="./app.js?v=5"></script>
 
 </body>
 </html>
